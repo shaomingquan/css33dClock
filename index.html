@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset='utf-8'/>
+        <script>
+            var cubes_stages,main_stage,cur_surface_num=0;
+            window.onload=function(){
+                if(getBrowserInfo()[0].split('/')[0]!='chrome'){
+                    document.write('i like chrome only!~');
+                    setTimeout(function(){
+                        window.close();
+                    },3000)
+                };
+                cubes_stages = getByClass(_ID('clock'),'cube');
+                main_stage = _ID('stage');                
+                cube_init();
+                setInterval(function(){
+                    clock_mechine_update();
+                },1000);
+            }
+            document.onmousemove=function(ev){
+                var e=ev||event;
+                var x=e.clientX;
+                var width = document.body.clientWidth;
+                _ID('stage').style.webkitTransform="rotateX("+(-5+(width/2-x)/100)+"deg) rotateY("+(10+(width/2-x)/200)+"deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(0px)";
+            }
+            function _ID(id){
+                return document.getElementById(id);
+            }
+            function CREATE_E(tag_name){
+                return document.createElement(tag_name);
+            }
+            function APPEND(father,son){
+                father.appendChild(son);
+            }
+            function cube_init(){
+                var i,j,cur_cube,cur_surface;
+                for(i = 0 ; i< cubes_stages.length;i++){
+                    cur_cube=cubes_stages[i];
+                    for(j = 1;j<7;j++){
+                        cur_surface=CREATE_E('div');
+                        addClass(cur_surface,'sf'+j);
+                        addClass(cur_surface,'sf');
+                        APPEND(cur_cube,cur_surface);
+                    }
+                }
+            }
+            var EE=[];
+            function clock_mechine_update(){
+                var date = new Date(),
+                    hour = date.getHours(),
+                    minute = date.getMinutes(),
+                    second = date.getSeconds(),
+                    time_string = parse_time(hour)+
+                                  parse_time(minute)+
+                                  parse_time(second),
+                    time_arr = time_string.split('');
+                for(var i = 0 ;i<cubes_stages.length;i++){
+                    // getByClass(cubes_stages[i],'sf')[cur_surface_num].innerHTML=time_arr[i];
+                    if(EE[i]==time_arr[i]){
+                        continue;
+                    }
+                    rotate(cubes_stages[i],i,time_arr[i]);
+                }
+                EE=time_arr;
+                cur_surface_num+=1;
+                cur_surface_num%=4;
+
+
+            }
+            var FF=[10,10,10,10,10,10];
+            var to_us=[0,0,0,0,0,0];
+            function rotate(cube,i,time){
+                cube.style.webkitTransform="rotateX("+(FF[i]-=90)+"deg) rotateY(0deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(0px)";
+                var faces = getByClass(cube,'sf');
+                to_us[i]++;
+                to_us[i]%=4;
+                faces[to_us[i]].innerHTML=time;
+                for(var j = 0;j<4;j++){
+                    faces[j].style.background='white';
+                }
+                faces[to_us[i]].style.background='purple';
+            }
+            function parse_time(data){
+                return data<10?('0'+data):(''+data);
+            }
+            function getByClass(oParent, sClass){
+                var aEle=oParent.getElementsByTagName('*');
+                var aResult=[];
+                var re=new RegExp('\\b'+sClass+'\\b', 'i');
+                var i=0;
+                for(i=0;i<aEle.length;i++)
+                {
+                    if(re.test(aEle[i].className))
+                    {
+                        aResult.push(aEle[i]);
+                    }
+                }
+                return aResult;
+            }
+            function addClass(element,value){  
+                if(!element.className){            
+                    element.className=value;
+                }
+                else{
+                    newClassName=element.className;
+                    newClassName+=" ";
+                    newClassName+=value;
+                    element.className=newClassName;
+                }
+            }
+            function getBrowserInfo(){
+                var agent = navigator.userAgent.toLowerCase() ;
+
+                var regStr_ie = /msie [\d.]+;/gi ;
+                var regStr_ff = /firefox\/[\d.]+/gi
+                var regStr_chrome = /chrome\/[\d.]+/gi ;
+                var regStr_saf = /safari\/[\d.]+/gi ;
+                //IE
+                if(agent.indexOf("msie") > 0)
+                {
+                return agent.match(regStr_ie) ;
+                }
+
+                //firefox
+                if(agent.indexOf("firefox") > 0)
+                {
+                return agent.match(regStr_ff) ;
+                }
+
+                //Chrome
+                if(agent.indexOf("chrome") > 0)
+                {
+                return agent.match(regStr_chrome) ;
+                }
+
+                //Safari
+                if(agent.indexOf("safari") > 0 && agent.indexOf("chrome") < 0)
+                {
+                return agent.match(regStr_saf) ;
+                }
+
+            } 
+        </script>
+        <style>
+            body{
+                font-family: sans-serif;
+            }
+            #stage{
+                position: relative;
+                width: 100%;
+                -webkit-transform: 
+                rotateX(-5deg) 
+                rotateY(10deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(0px); 
+                -webkit-transform-style: preserve-3d;
+                -webkit-transform-origin: center;
+            }
+            #clock{
+                width: 720px;
+                height: 100px;
+                margin: 20px auto;
+                -webkit-transform: 
+                rotateX(10deg) 
+                rotateY(10deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(0px); 
+                -webkit-transform-style: preserve-3d;
+                -webkit-transform-origin: center;
+            }
+            .ele{
+                width: 100px;
+                height: 100px;
+                padding: 10px;
+                display: block;
+                float: left;
+            }
+            .cube{
+                -webkit-transition:0.5s ;
+                background: none;
+                width: 80px;
+                height: 80px;
+                line-height: 80px;
+                text-align: center;
+                color: purple;
+                font-size: 40px;
+                float: left;
+                -webkit-transform: 
+                rotateX(10deg) 
+                rotateY(10deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(0px); 
+                -webkit-transform-style: preserve-3d;
+                -webkit-transform-origin: center;
+            }
+            .semicolon{
+                line-height: 80px;
+                text-align: center;
+                font-size: 50px;
+                width: 0px;
+            }
+            .sf1 , .sf2 , .sf3 , .sf4 , .sf5 , .sf6{
+                width: 100%;
+                height: 100%;
+                border: solid purple 1px;
+            }
+            .sf1{
+                -webkit-transform: 
+                rotateX(0deg) 
+                rotateY(0deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(40px); 
+                position:absolute;
+            }
+            .sf3{
+                -webkit-transform:rotateX(180deg) rotateY(0deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(40px); 
+                position:absolute;
+            }
+            .sf5{
+                -webkit-transform: 
+                rotateX(0deg) 
+                rotateY(-90deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(40px);
+                position:absolute;
+            }
+            .sf6{
+                -webkit-transform: 
+                rotateX(0deg) 
+                rotateY(-90deg) 
+                rotateZ(0deg) 
+                translateX(0px) 
+                translateY(0px) 
+                translateZ(-40px); 
+                position:absolute;
+            }
+            .sf2{
+                -webkit-transform:rotateX(90deg) rotateY(0deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(40px);
+                position:absolute;
+            }
+            .sf4{
+                -webkit-transform:rotateX(-90deg) rotateY(0deg) rotateZ(0deg) translateX(0px) translateY(0px) translateZ(40px);
+                position:absolute;
+            }
+            .sf{
+                -webkit-transition:0.4s ;
+                color: white;
+            }
+        </style>        
+    </head>
+    <body>
+        <div id="stage">
+            <div id="clock">
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+                <span class="ele">
+                    <div class="cube"></div>
+                </span>
+            </div>
+        </div>
+    </body>
+</html>
